@@ -21,6 +21,8 @@ eggs/
 lib/
 lib64/
 parts/
+# Keep frontend/lib/ (contains custom source code)
+!frontend/lib/
 sdist/
 var/
 wheels/
