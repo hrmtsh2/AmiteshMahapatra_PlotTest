@@ -1,0 +1,54 @@
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  auth0Id   String   @unique @map("auth0_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  csvFiles CsvFile[]
+
+  @@map("users")
+}
+
+model CsvFile {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  filename    String
+  originalName String  @map("original_name")
+  fileSize    Int      @map("file_size")
+  fileContent String   @map("file_content") // Store CSV content as text
+  
+  // CSV config settings
+  xColumn     String?  @map("x_column")
+  yColumn     String?  @map("y_column")
+  maxRows     Int?     @map("max_rows")
+  xRangeMin   Float?   @map("x_range_min")
+  xRangeMax   Float?   @map("x_range_max")
+  yRangeMin   Float?   @map("y_range_min")
+  yRangeMax   Float?   @map("y_range_max")
+  
+  // addtional metadata
+  columns     String[] // Array of column names
+  totalRows   Int      @map("total_rows")
+  description String?  // User-provided description
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("csv_files")
+}
